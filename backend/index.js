@@ -16,8 +16,10 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// API routes (define/folderize later)
+// Connect DB
 DBConnection();
+
+// API routes
 app.use("/api", router);
 
 // Start server

@@ -1,0 +1,46 @@
+services:
+  mongodb:
+    image: mongo:6
+    container_name: mongodb_container
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongodb_data:/data/db
+    restart: always
+
+  hadoop-namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: hadoop_namenode
+    environment:
+      - CLUSTER_NAME=test
+    volumes:
+      - ./hadoop_namenode:/hadoop/dfs/name
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    restart: always
+
+  hadoop-datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: hadoop_datanode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:9000
+      - CLUSTER_NAME=test
+    volumes:
+      - ./hadoop_datanode:/hadoop/dfs/data
+    ports:
+      - "9864:9864"
+    depends_on:
+      - hadoop-namenode
+    restart: always
+
+  scidb:
+    build:
+      context: ./backend/scidb
+      dockerfile: Dockerfile
+    container_name: scidb_container
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./backend/uploads:/data
+    restart: always
